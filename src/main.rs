@@ -39,6 +39,9 @@ mod bzimage;
 mod efi;
 mod fat;
 mod gdt;
+#[cfg(feature = "integration_tests")]
+#[cfg(test)]
+mod integration;
 mod loader;
 mod mem;
 mod paging;
