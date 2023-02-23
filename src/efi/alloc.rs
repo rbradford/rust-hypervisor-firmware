@@ -52,6 +52,12 @@ impl Allocator {
         address: u64,
         attributes: u64,
     ) -> Status {
+        log!(
+            "Add allocation: {:?} 0x{:x} {} ",
+            memory_type,
+            address,
+            page_count
+        );
         self.key += 1;
 
         if self.first_allocation.is_none() {
@@ -207,6 +213,12 @@ impl Allocator {
         page_count: u64,
         address: u64,
     ) -> (Status, u64) {
+        log!(
+            "Add allocation: {:?} 0x{:x} {} ",
+            memory_type,
+            address,
+            page_count
+        );
         let dest = self.find_free_memory(allocate_type, page_count, address);
 
         if dest.is_none() {

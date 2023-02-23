@@ -6,7 +6,8 @@ use fdt::Fdt;
 use crate::bootinfo::{EntryType, Info, MemoryEntry};
 
 pub struct StartInfo<'a> {
-    fdt: Fdt<'a>,
+    pub fdt: Fdt<'a>,
+    fdt_address: u64,
 }
 
 impl StartInfo<'_> {
@@ -18,7 +19,10 @@ impl StartInfo<'_> {
             }
         };
 
-        Self { fdt }
+        Self {
+            fdt,
+            fdt_address: ptr as u64,
+        }
     }
 
     pub fn find_compatible_region(&self, with: &[&str]) -> Option<(*const u8, usize)> {
@@ -35,9 +39,15 @@ impl Info for StartInfo<'_> {
         "FDT"
     }
 
+    #[cfg(target_arch = "aarch64")]
     fn rsdp_addr(&self) -> u64 {
         // TODO: Remove reference to a platform specific value.
         crate::arch::aarch64::layout::map::dram::ACPI_START as u64
+    }
+
+    #[cfg(target_arch = "riscv64")]
+    fn rsdp_addr(&self) -> u64 {
+        0
     }
 
     fn cmdline(&self) -> &[u8] {
@@ -62,5 +72,9 @@ impl Info for StartInfo<'_> {
             }
         }
         panic!("No valid memory entry found");
+    }
+
+    fn fdt_address(&self) -> Option<u64> {
+        Some(self.fdt_address)
     }
 }

@@ -3,7 +3,7 @@
 
 use core::ops::Range;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum MemoryAttribute {
     Code,
     Data,
@@ -11,7 +11,7 @@ pub enum MemoryAttribute {
     Unusable,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct MemoryDescriptor {
     pub name: &'static str,
     pub range: fn() -> Range<usize>,

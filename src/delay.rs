@@ -3,6 +3,8 @@
 // Copyright (C) 2018 Google LLC
 
 use core::arch::asm;
+#[cfg(target_arch = "riscv64")]
+use core::arch::riscv64::pause;
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64::_rdtsc;
 
@@ -36,6 +38,8 @@ unsafe fn pause() {
     asm!("pause");
 }
 
+// TODO: Use make a proper delay function
+#[cfg(not(target_arch = "riscv64"))]
 pub fn ndelay(ns: u64) {
     let delta = ns * CPU_KHZ_DEFAULT / NSECS_PER_SEC;
     let mut pause_delta = 0;
@@ -48,6 +52,13 @@ pub fn ndelay(ns: u64) {
             pause();
         }
         while rdtsc() - start < delta {}
+    }
+}
+
+#[cfg(target_arch = "riscv64")]
+pub fn ndelay(ns: u64) {
+    for _ in 0..ns {
+        unsafe { pause() };
     }
 }
 

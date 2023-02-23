@@ -12,6 +12,9 @@ pub trait Info {
     // Methods to access the Memory map
     fn num_entries(&self) -> usize;
     fn entry(&self, idx: usize) -> MemoryEntry;
+    fn fdt_address(&self) -> Option<u64> {
+        None
+    }
 }
 
 pub struct MemoryEntry {

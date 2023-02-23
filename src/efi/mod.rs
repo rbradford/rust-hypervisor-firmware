@@ -938,6 +938,9 @@ fn populate_allocator(info: &dyn bootinfo::Info, image_address: u64, image_size:
     #[cfg(target_arch = "x86_64")]
     use crate::arch::x86_64::layout::MEM_LAYOUT;
 
+    #[cfg(target_arch = "riscv64")]
+    use crate::arch::riscv64::layout::MEM_LAYOUT;
+
     for descriptor in MEM_LAYOUT {
         let memory_type = match descriptor.attribute {
             layout::MemoryAttribute::Code => efi::RUNTIME_SERVICES_CODE,
@@ -1099,6 +1102,19 @@ pub fn efi_exec(
     let ct = unsafe { &mut CT };
     ct[0] = ct_entry;
 
+    let ftd_ct_entry = efi::ConfigurationTable {
+        vendor_guid: Guid::from_fields(
+            0xb1b621d5,
+            0xf19c,
+            0x41a5,
+            0x83,
+            0x0b,
+            &[0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0],
+        ),
+        vendor_table: info.fdt_address().unwrap() as *const u64 as *mut _,
+    };
+    ct[0] = ftd_ct_entry;
+
     let mut stdin = console::STDIN;
     let mut stdout = console::STDOUT;
     let mut st = unsafe { &mut ST };
@@ -1116,11 +1132,16 @@ pub fn efi_exec(
 
     let wrapped_fs = file::FileSystemWrapper::new(fs, efi_part_id);
 
+    #[cfg(target_arch = "aarch64")]
+    let path = "\\EFI\\BOOT\\BOOTAA64.EFI";
+    #[cfg(target_arch = "x86_64")]
+    let path = "\\EFI\\BOOT\\BOOTX64.EFI";
+    // TODO: Check this is correct - I just guessed
+    #[cfg(target_arch = "riscv64")]
+    let path = "\\EFI\\BOOT\\BOOTRV64.EFI";
+
     let image = new_image_handle(
-        #[cfg(target_arch = "aarch64")]
-        "\\EFI\\BOOT\\BOOTAA64.EFI",
-        #[cfg(target_arch = "x86_64")]
-        "\\EFI\\BOOT\\BOOTX64.EFI",
+        path,
         0 as Handle,
         &wrapped_fs as *const _ as Handle,
         loaded_address,
