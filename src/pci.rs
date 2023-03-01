@@ -312,7 +312,7 @@ impl PciDevice {
         #[allow(clippy::disallowed_names)]
         for bar in &self.bars {
             log!(
-                "Bar: type={:?} address={:x} size={:x}",
+                "Bar: type={:?} address=0x{:x} size=0x{:x}",
                 bar.bar_type,
                 bar.address,
                 bar.size
