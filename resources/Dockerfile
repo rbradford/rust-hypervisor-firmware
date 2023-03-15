@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 FROM ubuntu:22.04 as dev
 
 ARG TARGETARCH
@@ -101,9 +103,9 @@ RUN echo 'source $CARGO_HOME/env' >> $HOME/.bashrc \
 	&& ln -s $CARGO_HOME/env $HOME/.cargo/env
 
 # Checkout coreboot repository and setup cross toolchains
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-	git clone --quiet --branch "$COREBOOT_VERSION" --depth 1 https://github.com/coreboot/coreboot.git "$COREBOOT_DIR" \
-	&& cd "$COREBOOT_DIR" \
-	&& git submodule update --init --checkout \
-	&& make crossgcc-i386 CPUS=`nproc`; \
-	fi
+#RUN if [ "$TARGETARCH" = "amd64" ]; then \
+#	git clone --quiet --branch "$COREBOOT_VERSION" --depth 1 https://github.com/coreboot/coreboot.git "$COREBOOT_DIR" \
+#	&& cd "$COREBOOT_DIR" \
+#	&& git submodule update --init --checkout \
+#	&& make crossgcc-i386 CPUS=`nproc`; \
+#	fi
